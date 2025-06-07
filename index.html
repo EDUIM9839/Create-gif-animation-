@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Text to GIF - Working Fix</title>
+  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    textarea, select, input[type="color"] {
+      margin: 5px;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>✨ Text to GIF (Mobile Friendly + Emojis)</h2>
+  
+  <textarea id="textInput" rows="4" cols="40" placeholder="Each line = 1 frame"></textarea><br>
+  
+  Font: 
+  <select id="fontSelect">
+    <option value="30px Arial">Arial</option>
+    <option value="30px Courier New">Courier New</option>
+    <option value="30px Comic Sans MS">Comic Sans</option>
+    <option value="30px Segoe UI Emoji">Segoe UI Emoji</option>
+  </select>
+
+  Color: <input type="color" id="colorPicker" value="#ff00ff"><br><br>
+  <button onclick="createGif()">🎞️ Generate GIF</button>
+
+  <div id="gifResult" style="margin-top: 20px;"></div>
+
+  <script>
+    function createGif() {
+      const text = document.getElementById("textInput").value.trim().split("\n");
+      const font = document.getElementById("fontSelect").value;
+      const color = document.getElementById("colorPicker").value;
+      const frames = [];
+
+      for (let i = 0; i < text.length; i++) {
+        frames.push(`<div style="font:${font};color:${color};width:400px;height:200px;display:flex;align-items:center;justify-content:center;">${text[i]}</div>`);
+      }
+
+      document.getElementById("gifResult").innerHTML = "Generating...";
+
+      gifshot.createGIF({
+        gifWidth: 400,
+        gifHeight: 200,
+        interval: 1,
+        images: [],
+        frameDuration: 1,
+        numFrames: text.length,
+        text: '',
+        fontWeight: 'bold',
+        fontSize: '24px',
+        fontFamily: 'Arial',
+        sampleInterval: 10,
+        frameText: '',
+        progressCallback: function (e) {
+          console.log('Progress:', e);
+        },
+        html2Canvas: true,
+        frameHtml: frames
+      }, function(obj) {
+        if (!obj.error) {
+          const image = obj.image;
+          const animatedImage = document.createElement('img');
+          animatedImage.src = image;
+
+          const downloadLink = document.createElement("a");
+          downloadLink.href = image;
+          downloadLink.download = "text-gif.gif";
+          downloadLink.innerText = "⬇️ Download GIF";
+          downloadLink.style.display = "block";
+          downloadLink.style.marginTop = "10px";
+
+          const result = document.getElementById("gifResult");
+          result.innerHTML = "";
+          result.appendChild(animatedImage);
+          result.appendChild(downloadLink);
+        } else {
+          document.getElementById("gifResult").innerText = "GIF generation failed.";
+        }
+      });
+    }
+  </script>
+</body>
+</html>

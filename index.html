@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Text to GIF (Mobile + Emojis)</title>
+  <title>WhatsApp Style Text to GIF</title>
   <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
   <style>
@@ -10,17 +10,31 @@
       font-family: sans-serif;
       text-align: center;
       padding: 20px;
+      background-color: #e5ddd5;
     }
     textarea {
       width: 90%;
       height: 100px;
-      font-size: 18px;
+      font-size: 16px;
       margin-bottom: 10px;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-top: 10px;
+    .chat-bubble {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 5px;
+      font-size: 18px;
+      display: inline-block;
+    }
+    .left {
+      background-color: white;
+      color: black;
+      align-self: flex-start;
+    }
+    .right {
+      background-color: #dcf8c6;
+      color: black;
+      align-self: flex-end;
     }
     #result {
       margin-top: 20px;
@@ -29,43 +43,45 @@
 </head>
 <body>
 
-  <h2>✨ Text to GIF Generator</h2>
+  <h2>💬 WhatsApp Chat to GIF</h2>
 
-  <textarea id="textInput">I love you ❤️\n😘\n💕</textarea><br>
+  <textarea id="chatInput">👋 Hello!\nHow are you?\nI'm good 😊\nWhat's up?</textarea><br>
 
-  Font: 
-  <select id="fontSelect">
-    <option value="30px Arial">Arial</option>
-    <option value="30px 'Segoe UI Emoji'">Emoji</option>
-    <option value="30px Courier New">Courier New</option>
+  Style:
+  <select id="styleSelect">
+    <option value="left">Left (Friend)</option>
+    <option value="right">Right (You)</option>
   </select>
 
-  Color: 
-  <input type="color" id="colorPicker" value="#ff00ff"><br><br>
-
-  <button onclick="generateGif()">Generate GIF</button>
+  <button onclick="generateGif()">Generate WhatsApp GIF</button>
 
   <div id="result">GIF will appear here</div>
 
   <script>
     function generateGif() {
-      const lines = document.getElementById("textInput").value.split("\n");
-      const font = document.getElementById("fontSelect").value;
-      const color = document.getElementById("colorPicker").value;
+      const lines = document.getElementById("chatInput").value.trim().split("\n");
+      const style = document.getElementById("styleSelect").value;
 
-      const frames = lines.map(line => `
-        <div style="width:300px;height:150px;display:flex;align-items:center;justify-content:center;
-                    font:${font};color:${color};background:white;">
-          ${line}
-        </div>
-      `);
+      const frames = lines.map((line, i) => {
+        let bubbles = '';
+        for (let j = 0; j <= i; j++) {
+          const side = j % 2 === 0 ? style : (style === 'left' ? 'right' : 'left');
+          bubbles += `<div class="chat-bubble ${side}">${lines[j]}</div><br>`;
+        }
+
+        return `
+          <div style="width:300px;height:200px;padding:10px;background:#e5ddd5;display:flex;flex-direction:column;">
+            ${bubbles}
+          </div>
+        `;
+      });
 
       document.getElementById("result").innerText = "Generating...";
 
       gifshot.createGIF({
         gifWidth: 300,
-        gifHeight: 150,
-        interval: 1,
+        gifHeight: 200,
+        interval: 1.2,
         frameHtml: frames,
         numFrames: frames.length,
         html2Canvas: true
@@ -77,15 +93,15 @@
 
           const link = document.createElement('a');
           link.href = obj.image;
-          link.download = 'text.gif';
-          link.textContent = 'Download GIF';
+          link.download = 'whatsapp_chat.gif';
+          link.textContent = '⬇️ Download GIF';
 
           result.innerHTML = '';
           result.appendChild(img);
           result.appendChild(document.createElement('br'));
           result.appendChild(link);
         } else {
-          result.innerText = "❌ GIF generation failed!";
+          result.innerText = "❌ Failed to generate GIF.";
         }
       });
     }

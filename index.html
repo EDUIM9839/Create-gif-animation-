@@ -1,93 +1,87 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Text to GIF - Working Fix</title>
+  <title>Text to GIF - Mobile Working</title>
   <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
   <style>
     body {
-      font-family: sans-serif;
       text-align: center;
+      font-family: sans-serif;
       padding: 20px;
     }
-    textarea, select, input[type="color"] {
-      margin: 5px;
-      padding: 5px;
+    textarea {
+      width: 90%;
+      height: 100px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h2>✨ Text to GIF (Mobile Friendly + Emojis)</h2>
-  
-  <textarea id="textInput" rows="4" cols="40" placeholder="Each line = 1 frame"></textarea><br>
-  
+
+  <h2>✨ Text to GIF Generator</h2>
+
+  <textarea id="textInput" placeholder="Enter text (1 line = 1 frame)...">I love you ❤️</textarea><br><br>
+
   Font: 
   <select id="fontSelect">
     <option value="30px Arial">Arial</option>
-    <option value="30px Courier New">Courier New</option>
-    <option value="30px Comic Sans MS">Comic Sans</option>
-    <option value="30px Segoe UI Emoji">Segoe UI Emoji</option>
+    <option value="30px Courier New">Courier</option>
+    <option value="30px Comic Sans MS">Comic</option>
+    <option value="30px Segoe UI Emoji">Emoji Font</option>
   </select>
-
   Color: <input type="color" id="colorPicker" value="#ff00ff"><br><br>
-  <button onclick="createGif()">🎞️ Generate GIF</button>
 
-  <div id="gifResult" style="margin-top: 20px;"></div>
+  <button onclick="generateGif()">Generate GIF</button>
+
+  <div id="result" style="margin-top: 20px;">GIF will appear here</div>
 
   <script>
-    function createGif() {
-      const text = document.getElementById("textInput").value.trim().split("\n");
+    function generateGif() {
+      const lines = document.getElementById("textInput").value.trim().split("\n");
       const font = document.getElementById("fontSelect").value;
       const color = document.getElementById("colorPicker").value;
-      const frames = [];
 
-      for (let i = 0; i < text.length; i++) {
-        frames.push(`<div style="font:${font};color:${color};width:400px;height:200px;display:flex;align-items:center;justify-content:center;">${text[i]}</div>`);
-      }
+      const htmlFrames = lines.map(text => {
+        return `
+          <div style="width:400px;height:200px;display:flex;justify-content:center;align-items:center;
+                      font:${font};color:${color};background:white;">
+            ${text}
+          </div>`;
+      });
 
-      document.getElementById("gifResult").innerHTML = "Generating...";
+      document.getElementById("result").innerText = "Generating...";
 
       gifshot.createGIF({
         gifWidth: 400,
         gifHeight: 200,
-        interval: 1,
         images: [],
-        frameDuration: 1,
-        numFrames: text.length,
-        text: '',
-        fontWeight: 'bold',
-        fontSize: '24px',
-        fontFamily: 'Arial',
-        sampleInterval: 10,
-        frameText: '',
-        progressCallback: function (e) {
-          console.log('Progress:', e);
-        },
-        html2Canvas: true,
-        frameHtml: frames
+        frameHtml: htmlFrames,
+        interval: 1,
+        numFrames: htmlFrames.length,
+        html2Canvas: true
       }, function(obj) {
         if (!obj.error) {
-          const image = obj.image;
-          const animatedImage = document.createElement('img');
-          animatedImage.src = image;
+          const img = document.createElement('img');
+          img.src = obj.image;
 
-          const downloadLink = document.createElement("a");
-          downloadLink.href = image;
-          downloadLink.download = "text-gif.gif";
-          downloadLink.innerText = "⬇️ Download GIF";
-          downloadLink.style.display = "block";
-          downloadLink.style.marginTop = "10px";
+          const download = document.createElement('a');
+          download.href = obj.image;
+          download.download = "text.gif";
+          download.textContent = "Download GIF";
 
-          const result = document.getElementById("gifResult");
-          result.innerHTML = "";
-          result.appendChild(animatedImage);
-          result.appendChild(downloadLink);
+          const resultDiv = document.getElementById("result");
+          resultDiv.innerHTML = "";
+          resultDiv.appendChild(img);
+          resultDiv.appendChild(document.createElement('br'));
+          resultDiv.appendChild(download);
         } else {
-          document.getElementById("gifResult").innerText = "GIF generation failed.";
+          document.getElementById("result").innerText = "Failed to generate GIF.";
         }
       });
     }
   </script>
+
 </body>
 </html>

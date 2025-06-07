@@ -50,6 +50,7 @@
     ctx.textBaseline = "middle";
 
     function captureFrame() {
+      // Add current canvas frame to gif with a delay of 100ms
       gif.addFrame(canvas, { copy: true, delay: 100 });
     }
 
@@ -79,7 +80,7 @@
       const link = document.createElement('a');
       link.href = gifUrl;
       link.download = 'emoji-animation.gif';
-      link.click(); // Trigger download
+      link.click(); // Trigger download of GIF
     });
 
     document.getElementById("startBtn").addEventListener("click", function() {

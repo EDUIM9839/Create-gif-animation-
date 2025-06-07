@@ -2,110 +2,122 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WhatsApp Style Text to GIF</title>
-  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+  <title>WhatsApp Style GIF Generator</title>
   <style>
     body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
+      font-family: Arial, sans-serif;
       background-color: #e5ddd5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-    textarea {
-      width: 90%;
-      height: 100px;
-      font-size: 16px;
+
+    .chat-box {
+      background-color: #ffffff;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      width: 320px;
+    }
+
+    .header {
+      font-weight: bold;
+      color: #075E54;
       margin-bottom: 10px;
-    }
-    .chat-bubble {
-      max-width: 70%;
-      padding: 10px 14px;
-      border-radius: 8px;
-      margin: 5px;
       font-size: 18px;
-      display: inline-block;
     }
-    .left {
-      background-color: white;
-      color: black;
-      align-self: flex-start;
+
+    input[type="file"] {
+      margin-bottom: 10px;
+      width: 100%;
     }
-    .right {
-      background-color: #dcf8c6;
-      color: black;
-      align-self: flex-end;
+
+    button {
+      background-color: #25D366;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 5px;
     }
-    #result {
-      margin-top: 20px;
+
+    button:hover {
+      background-color: #128C7E;
+    }
+
+    .gif-preview {
+      margin-top: 15px;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .download-btn {
+      margin-top: 10px;
+      background-color: #34B7F1;
     }
   </style>
 </head>
 <body>
+  <div class="chat-box">
+    <div class="header">GIF Generator (WhatsApp Style)</div>
+    <input type="file" id="imageInput" multiple accept="image/*">
+    <button onclick="createGif()">Generate GIF</button>
+    <img id="gifPreview" class="gif-preview" alt="GIF Preview" />
+    <a id="downloadLink" class="download-btn" style="display:none;" download="whatsapp-style.gif">
+      <button class="download-btn">Download GIF</button>
+    </a>
+  </div>
 
-  <h2>💬 WhatsApp Chat to GIF</h2>
-
-  <textarea id="chatInput">👋 Hello!\nHow are you?\nI'm good 😊\nWhat's up?</textarea><br>
-
-  Style:
-  <select id="styleSelect">
-    <option value="left">Left (Friend)</option>
-    <option value="right">Right (You)</option>
-  </select>
-
-  <button onclick="generateGif()">Generate WhatsApp GIF</button>
-
-  <div id="result">GIF will appear here</div>
+  <!-- Include gif.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 
   <script>
-    function generateGif() {
-      const lines = document.getElementById("chatInput").value.trim().split("\n");
-      const style = document.getElementById("styleSelect").value;
+    function createGif() {
+      const input = document.getElementById('imageInput');
+      const preview = document.getElementById('gifPreview');
+      const downloadLink = document.getElementById('downloadLink');
+      const files = input.files;
 
-      const frames = lines.map((line, i) => {
-        let bubbles = '';
-        for (let j = 0; j <= i; j++) {
-          const side = j % 2 === 0 ? style : (style === 'left' ? 'right' : 'left');
-          bubbles += `<div class="chat-bubble ${side}">${lines[j]}</div><br>`;
-        }
+      if (!files.length) {
+        alert('Please upload at least one image.');
+        return;
+      }
 
-        return `
-          <div style="width:300px;height:200px;padding:10px;background:#e5ddd5;display:flex;flex-direction:column;">
-            ${bubbles}
-          </div>
-        `;
+      const gif = new GIF({
+        workers: 2,
+        quality: 10,
+        workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
       });
 
-      document.getElementById("result").innerText = "Generating...";
+      let loadedImages = 0;
 
-      gifshot.createGIF({
-        gifWidth: 300,
-        gifHeight: 200,
-        interval: 1.2,
-        frameHtml: frames,
-        numFrames: frames.length,
-        html2Canvas: true
-      }, function(obj) {
-        const result = document.getElementById("result");
-        if (!obj.error) {
-          const img = document.createElement('img');
-          img.src = obj.image;
-
-          const link = document.createElement('a');
-          link.href = obj.image;
-          link.download = 'whatsapp_chat.gif';
-          link.textContent = '⬇️ Download GIF';
-
-          result.innerHTML = '';
-          result.appendChild(img);
-          result.appendChild(document.createElement('br'));
-          result.appendChild(link);
-        } else {
-          result.innerText = "❌ Failed to generate GIF.";
-        }
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            gif.addFrame(img, { delay: 200 });
+            loadedImages++;
+            if (loadedImages === files.length) {
+              gif.on('finished', function(blob) {
+                const gifURL = URL.createObjectURL(blob);
+                preview.src = gifURL;
+                downloadLink.href = gifURL;
+                downloadLink.style.display = 'block';
+              });
+              gif.render();
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
       });
     }
   </script>
-
 </body>
 </html>

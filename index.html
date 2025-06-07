@@ -2,123 +2,92 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WhatsApp Style GIF Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Emoji Animation to GIF</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.min.js"></script>
   <style>
     body {
-      background-color: #e5ddd5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
       font-family: Arial, sans-serif;
-    }
-
-    .chat-box {
-      background-color: #fff;
-      border-radius: 8px;
-      padding: 15px;
-      width: 320px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-
-    input[type="file"] {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
-    button {
-      background-color: #25D366;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      width: 100%;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background-color: #128C7E;
-    }
-
-    .preview {
-      margin-top: 15px;
       text-align: center;
+      margin-top: 50px;
     }
-
-    .preview img {
-      max-width: 100%;
-      border-radius: 5px;
+    canvas {
+      border: 2px solid #000;
+      margin-bottom: 20px;
     }
-
-    .download {
-      display: none;
-      margin-top: 10px;
-      background-color: #34B7F1;
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
+  <h1>Text Emoji Animation to GIF</h1>
+  <canvas id="emojiCanvas" width="300" height="300"></canvas><br>
+  <button id="startBtn">Start Animation & Convert to GIF</button>
 
-  <div class="chat-box">
-    <h3>GIF Generator (WhatsApp Style)</h3>
-    <input type="file" id="imageInput" multiple accept="image/*">
-    <button onclick="generateGIF()">Create GIF</button>
-
-    <div class="preview">
-      <img id="gifPreview" src="" alt="GIF will appear here">
-      <a id="downloadLink" class="download" download="animated.gif">
-        <button class="download">Download GIF</button>
-      </a>
-    </div>
-  </div>
-
-  <!-- gif.js and worker -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
   <script>
-    function generateGIF() {
-      const input = document.getElementById('imageInput');
-      const preview = document.getElementById('gifPreview');
-      const downloadLink = document.getElementById('downloadLink');
-      const files = input.files;
+    const canvas = document.getElementById("emojiCanvas");
+    const ctx = canvas.getContext("2d");
 
-      if (files.length === 0) {
-        alert("Please select some images.");
-        return;
-      }
+    const gif = new GIF({
+      workers: 2,
+      quality: 10,
+      width: canvas.width,
+      height: canvas.height,
+    });
 
-      const gif = new GIF({
-        workers: 2,
-        quality: 10,
-        width: 300,
-        height: 300
-      });
+    let x = canvas.width / 2;
+    let y = canvas.height / 2;
+    let dx = 2;
+    let dy = 2;
+    let isAnimating = false;
 
-      let loaded = 0;
+    // Draw initial text emoji
+    ctx.font = "60px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
 
-      for (let i = 0; i < files.length; i++) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const img = new Image();
-          img.onload = function () {
-            gif.addFrame(img, { delay: 200 });
-            loaded++;
-            if (loaded === files.length) {
-              gif.on('finished', function (blob) {
-                const url = URL.createObjectURL(blob);
-                preview.src = url;
-                downloadLink.href = url;
-                downloadLink.style.display = 'block';
-              });
-              gif.render();
-            }
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(files[i]);
+    function captureFrame() {
+      gif.addFrame(canvas, { copy: true, delay: 100 });
+    }
+
+    function animateGif() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
+      ctx.fillText("😊", x, y); // Draw emoji
+
+      x += dx;
+      y += dy;
+
+      // Bounce the emoji when it hits canvas edges
+      if (x + 30 > canvas.width || x - 30 < 0) dx = -dx;
+      if (y + 30 > canvas.height || y - 30 < 0) dy = -dy;
+
+      captureFrame(); // Capture current frame for GIF
+
+      // Stop when we have enough frames for the GIF
+      if (gif.frames.length < 50) {
+        requestAnimationFrame(animateGif); // Continue animation
+      } else {
+        gif.render(); // Render and create GIF
       }
     }
+
+    gif.on('finished', function(blob) {
+      const gifUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = gifUrl;
+      link.download = 'emoji-animation.gif';
+      link.click(); // Trigger download
+    });
+
+    document.getElementById("startBtn").addEventListener("click", function() {
+      if (!isAnimating) {
+        isAnimating = true;
+        animateGif();
+      }
+    });
   </script>
 </body>
 </html>

@@ -1,94 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Text Emoji Animation to GIF</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>Image to GIF Converter</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
       text-align: center;
-      margin-top: 50px;
+      background: #f0f0f0;
+      padding: 20px;
     }
-    canvas {
-      border: 2px solid #000;
-      margin-bottom: 20px;
+    input, button {
+      margin: 10px;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
+    img {
+      margin-top: 20px;
+      max-width: 300px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
-  <h1>Text Emoji Animation to GIF</h1>
-  <canvas id="emojiCanvas" width="300" height="300"></canvas><br>
-  <button id="startBtn">Start Animation & Convert to GIF</button>
+  <h2>Upload Images → Convert to GIF</h2>
+  <input type="file" id="upload" accept="image/*" multiple />
+  <br />
+  <button onclick="createGIF()">Generate GIF</button>
+  <br />
+  <img id="result" />
+
+  <!-- gif.js inline build (no worker file needed) -->
+  <script src="https://unpkg.com/gif.js.optimized/dist/gif.js"></script>
+  <script src="https://unpkg.com/gif.js.optimized/dist/gif.worker.js"></script>
 
   <script>
-    const canvas = document.getElementById("emojiCanvas");
-    const ctx = canvas.getContext("2d");
+    const upload = document.getElementById('upload');
+    const result = document.getElementById('result');
+    let images = [];
 
-    const gif = new GIF({
-      workers: 2,
-      quality: 10,
-      width: canvas.width,
-      height: canvas.height,
+    upload.addEventListener('change', (e) => {
+      images = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name));
     });
 
-    let x = canvas.width / 2;
-    let y = canvas.height / 2;
-    let dx = 2;
-    let dy = 2;
-    let isAnimating = false;
+    async function createGIF() {
+      if (images.length === 0) {
+        alert('Please upload some images first.');
+        return;
+      }
 
-    // Draw initial text emoji
-    ctx.font = "60px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+      const gif = new GIF({
+        workers: 2,
+        quality: 10,
+        width: 300,
+        height: 300,
+      });
 
-    function captureFrame() {
-      // Add current canvas frame to gif with a delay of 100ms
-      gif.addFrame(canvas, { copy: true, delay: 100 });
+      for (const file of images) {
+        const img = await loadImage(URL.createObjectURL(file));
+        gif.addFrame(img, { delay: 200 });
+      }
+
+      gif.on('finished', (blob) => {
+        result.src = URL.createObjectURL(blob);
+      });
+
+      gif.render();
     }
 
-    function animateGif() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
-      ctx.fillText("😊", x, y); // Draw emoji
-
-      x += dx;
-      y += dy;
-
-      // Bounce the emoji when it hits canvas edges
-      if (x + 30 > canvas.width || x - 30 < 0) dx = -dx;
-      if (y + 30 > canvas.height || y - 30 < 0) dy = -dy;
-
-      captureFrame(); // Capture current frame for GIF
-
-      // Stop when we have enough frames for the GIF
-      if (gif.frames.length < 50) {
-        requestAnimationFrame(animateGif); // Continue animation
-      } else {
-        gif.render(); // Render and create GIF
-      }
+    function loadImage(src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.src = src;
+      });
     }
-
-    gif.on('finished', function(blob) {
-      const gifUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = gifUrl;
-      link.download = 'emoji-animation.gif';
-      link.click(); // Trigger download of GIF
-    });
-
-    document.getElementById("startBtn").addEventListener("click", function() {
-      if (!isAnimating) {
-        isAnimating = true;
-        animateGif();
-      }
-    });
   </script>
 </body>
 </html>

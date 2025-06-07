@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Image to GIF Converter</title>
+  <title>Image to GIF </title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
+      padding: 30px;
       background: #f0f0f0;
-      padding: 20px;
     }
     input, button {
       margin: 10px;
@@ -21,14 +21,14 @@
   </style>
 </head>
 <body>
-  <h2>Upload Images → Convert to GIF</h2>
+  <h2>Upload Images → Generate GIF</h2>
   <input type="file" id="upload" accept="image/*" multiple />
   <br />
   <button onclick="createGIF()">Generate GIF</button>
   <br />
-  <img id="result" />
+  <img id="result" alt="Generated GIF will appear here" />
 
-  <!-- gif.js inline build (no worker file needed) -->
+  <!-- Include gif.js and worker -->
   <script src="https://unpkg.com/gif.js.optimized/dist/gif.js"></script>
   <script src="https://unpkg.com/gif.js.optimized/dist/gif.worker.js"></script>
 

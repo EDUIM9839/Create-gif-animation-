@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Image to GIF</title>
+  <title>Image to GIF Generator</title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
-      padding: 30px;
       background: #f0f0f0;
+      padding: 30px;
     }
     input, button {
       margin: 10px;
@@ -21,7 +21,7 @@
   </style>
 </head>
 <body>
-  <h2>Upload Images → Generate GIF </h2>
+  <h2>Upload Images → Generate GIF 2</h2>
   <input type="file" id="upload" accept="image/*" multiple />
   <br />
   <button onclick="createGIF()">Generate GIF</button>
@@ -56,8 +56,8 @@
     }
 
     async function createGIF() {
-      if (images.length === 0) {
-        alert('Please upload some images first.');
+      if (images.length < 2) {
+        alert('Please upload at least two images to generate animation.');
         return;
       }
 
@@ -71,13 +71,18 @@
 
       for (const file of images) {
         const canvas = await loadImageToCanvas(file, 300, 300);
-        gif.addFrame(canvas, { delay: 200 });
+        gif.addFrame(canvas, { delay: 500 }); // 500ms = 0.5s per frame
       }
 
-      gif.on('finished', (blob) => {
-        const gifUrl = URL.createObjectURL(blob);
-        result.src = gifUrl;
-        console.log('GIF generated:', gifUrl);
+      gif.on('finished', function(blob) {
+        const url = URL.createObjectURL(blob);
+        result.src = url;
+        result.style.display = 'block';
+        console.log('GIF created:', url);
+      });
+
+      gif.on('progress', function(p) {
+        console.log('Progress:', Math.round(p * 100) + '%');
       });
 
       gif.render();

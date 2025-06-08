@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-image: linear-gradient(to top, #c471f5 0%, #fa71cd 100%);
+}
+
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 90%;
+    height: 100vh;
+}
+
+.container > h1 {
+    font-size: 50px;
+    text-shadow: 1px 1px rgb(200, 200, 200);
+    color: rgb(63, 63, 63);
+}
+
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: #83188b;
+    color: #ffffff;
+    border-radius: 0.5em;
+    font-weight: 500;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    font-size: 20px;
+    padding: 10px !important;
+    width: 150px;
+    margin-left: auto;
+}
+
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    outline: none;
+}
+
+.search-container input {
+    padding: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 0.5em;
+    border: none;
+    width: 400px;
+    margin-right: 10px;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.wrapper {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.img-container {
+    background-color: #2b304d;
+    display: flex;
+    padding: 0.5em;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 1.5em;
+    border-radius: 0.5em;
+    width: 280px;
+}
+
+.img-container img {
+    height: 150px;
+}
+
+.img-container button {
+    margin-top: 1em;
+    padding: 1em 0;
+}
+
+.loader {
+    display: none;
+    height: 10em;
+    width: 10em;
+    border: 3em solid #83188b;
+    border-radius: 50%;
+    border-top-color: #bd2db6;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    animation: spin 3s infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .wrapper {  
+            grid-template-columns: repeat(2, 1fr);
+    }
+    .container {
+        margin: 0.7em;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .wrapper {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,28 +1,35 @@
-<style>
-  #canvas1 {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px;
-  height: 600px;
-}
-.controls {
-  position: absolute;
-  z-index: 10;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.controls,
-select,
-option {
-  font-size: 25px;
-}</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sprite Animation with Upload</title>
+  <style>
+    #canvas1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+    }
+    .controls {
+      position: absolute;
+      z-index: 10;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .controls, select, option, input {
+      font-size: 25px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
 <canvas id="canvas1"></canvas>
 <div class="controls">
   <label for="animations">Choose Animation:</label>
-  <select id="animations" name="animations">
+  <select id="animations">
     <option value="idle">Idle</option>
     <option value="jump">Jump</option>
     <option value="fall">Fall</option>
@@ -33,9 +40,12 @@ option {
     <option value="bite">Bite</option>
     <option value="ko">KO</option>
     <option value="gethit">Get hit</option>
-  </select>
+  </select><br>
+  <input type="file" id="imageUpload" accept="image/*">
 </div>
-<script>let playerState = "idle";
+
+<script>
+let playerState = "idle";
 const dropdown = document.getElementById("animations");
 dropdown.addEventListener("change", function (e) {
   playerState = e.target.value;
@@ -43,11 +53,23 @@ dropdown.addEventListener("change", function (e) {
 
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
-const CANVAS_WIDTH = (canvas.width = 600);
-const CANVAS_HEIGHT = (canvas.height = 600);
+const CANVAS_WIDTH = canvas.width = 600;
+const CANVAS_HEIGHT = canvas.height = 600;
 
 const playerImage = new Image();
-playerImage.src = "https://www.frankslaboratory.co.uk/downloads/shadow_dog.png";
+playerImage.src = "https://www.frankslaboratory.co.uk/downloads/shadow_dog.png"; // default
+
+document.getElementById("imageUpload").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      playerImage.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
 const spriteWidth = 575;
 const spriteHeight = 523;
 
@@ -55,51 +77,20 @@ let gameFrame = 0;
 const staggerFrames = 5;
 const spriteAnimations = [];
 const animationStates = [
-  {
-    name: "idle",
-    frames: 7
-  },
-  {
-    name: "jump",
-    frames: 7
-  },
-  {
-    name: "fall",
-    frames: 7
-  },
-  {
-    name: "run",
-    frames: 9
-  },
-  {
-    name: "dizzy",
-    frames: 11
-  },
-  {
-    name: "sit",
-    frames: 5
-  },
-  {
-    name: "roll",
-    frames: 7
-  },
-  {
-    name: "bite",
-    frames: 7
-  },
-  {
-    name: "ko",
-    frames: 12
-  },
-  {
-    name: "gethit",
-    frames: 4
-  }
+  { name: "idle", frames: 7 },
+  { name: "jump", frames: 7 },
+  { name: "fall", frames: 7 },
+  { name: "run", frames: 9 },
+  { name: "dizzy", frames: 11 },
+  { name: "sit", frames: 5 },
+  { name: "roll", frames: 7 },
+  { name: "bite", frames: 7 },
+  { name: "ko", frames: 12 },
+  { name: "gethit", frames: 4 }
 ];
+
 animationStates.forEach((state, index) => {
-  let frames = {
-    loc: []
-  };
+  let frames = { loc: [] };
   for (let j = 0; j < state.frames; j++) {
     let positionX = j * spriteWidth;
     let positionY = index * spriteHeight;
@@ -107,30 +98,19 @@ animationStates.forEach((state, index) => {
   }
   spriteAnimations[state.name] = frames;
 });
-console.log(spriteAnimations);
 
 function animate() {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  let position =
-    Math.floor(gameFrame / staggerFrames) %
-    spriteAnimations[playerState].loc.length;
+  let position = Math.floor(gameFrame / staggerFrames) % spriteAnimations[playerState].loc.length;
   let frameX = spriteWidth * position;
   let frameY = spriteAnimations[playerState].loc[position].y;
 
-  ctx.drawImage(
-    playerImage,
-    frameX,
-    frameY,
-    spriteWidth,
-    spriteHeight,
-    0,
-    0,
-    spriteWidth,
-    spriteHeight
-  );
+  ctx.drawImage(playerImage, frameX, frameY, spriteWidth, spriteHeight, 0, 0, spriteWidth, spriteHeight);
 
   gameFrame++;
   requestAnimationFrame(animate);
 }
 animate();
 </script>
+</body>
+</html>

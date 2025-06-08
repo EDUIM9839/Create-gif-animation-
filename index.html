@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Animate Static Image</title>
+  <title>Static Image Animation with Dynamic Options</title>
   <style>
     #canvas1 {
       position: absolute;
@@ -31,13 +31,8 @@
 <div class="controls">
   <input type="file" id="imageUpload" accept="image/*" />
   <br>
-  <label for="animations">Animation Type:</label>
-  <select id="animations">
-    <option value="bounce">Bounce</option>
-    <option value="slide">Slide</option>
-    <option value="shake">Shake</option>
-    <option value="rotate">Rotate</option>
-  </select>
+  <label for="animations">Choose Animation:</label>
+  <select id="animations"></select>
 </div>
 
 <script>
@@ -48,13 +43,29 @@ canvas.height = 600;
 
 let img = new Image();
 let imgLoaded = false;
-let playerState = 'bounce';
+let playerState = 'idle';
 let frameCount = 0;
 
-document.getElementById("animations").addEventListener("change", function(e) {
+// 1. Dynamically add options to the <select>
+const animationList = [
+  "idle", "jump", "fall", "run", "dizzy",
+  "sit", "roll", "bite", "ko", "gethit"
+];
+
+const select = document.getElementById("animations");
+animationList.forEach(anim => {
+  const option = document.createElement("option");
+  option.value = anim;
+  option.textContent = anim.charAt(0).toUpperCase() + anim.slice(1);
+  select.appendChild(option);
+});
+
+// 2. Handle animation selection
+select.addEventListener("change", (e) => {
   playerState = e.target.value;
 });
 
+// 3. Handle image upload
 document.getElementById("imageUpload").addEventListener("change", function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -68,24 +79,42 @@ document.getElementById("imageUpload").addEventListener("change", function(e) {
   reader.readAsDataURL(file);
 });
 
+// 4. Simulated animation
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (imgLoaded) {
-    let dx = 0, dy = 0, angle = 0, scale = 1;
+    let dx = 0, dy = 0, angle = 0;
 
     switch (playerState) {
-      case 'bounce':
-        dy = Math.sin(frameCount * 0.1) * 20;
+      case 'idle':
         break;
-      case 'slide':
-        dx = Math.sin(frameCount * 0.05) * 40;
+      case 'jump':
+        dy = Math.sin(frameCount * 0.1) * -20;
         break;
-      case 'shake':
-        dx = Math.sin(frameCount * 0.5) * 5;
-        dy = Math.cos(frameCount * 0.5) * 5;
+      case 'fall':
+        dy = Math.sin(frameCount * 0.1) * 10;
         break;
-      case 'rotate':
-        angle = Math.sin(frameCount * 0.05) * 0.5;
+      case 'run':
+        dx = Math.sin(frameCount * 0.2) * 25;
+        break;
+      case 'dizzy':
+        angle = Math.sin(frameCount * 0.2) * 1;
+        break;
+      case 'sit':
+        ctx.globalAlpha = 0.5;
+        break;
+      case 'roll':
+        angle = frameCount * 0.1;
+        break;
+      case 'bite':
+        dx = Math.sin(frameCount * 0.4) * 10;
+        break;
+      case 'ko':
+        ctx.globalAlpha = 1 - (frameCount % 100) / 100;
+        dy = 20;
+        break;
+      case 'gethit':
+        ctx.globalAlpha = (frameCount % 10 < 5) ? 0.2 : 1;
         break;
     }
 
@@ -94,6 +123,7 @@ function animate() {
     if (angle) ctx.rotate(angle);
     ctx.drawImage(img, -img.width / 2, -img.height / 2);
     ctx.restore();
+    ctx.globalAlpha = 1;
   }
 
   frameCount++;

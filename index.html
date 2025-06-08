@@ -1,9 +1,8 @@
-[media pointer="file-service://file-J41VD9DVhtPuR6MvP5w7yW"]
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sprite Animation with Upload</title>
+  <meta charset="UTF-8" />
+  <title>Animate Static Image</title>
   <style>
     #canvas1 {
       position: absolute;
@@ -16,99 +15,88 @@
     .controls {
       position: absolute;
       z-index: 10;
-      top: 100px;
+      top: 30px;
       left: 50%;
       transform: translateX(-50%);
+      text-align: center;
     }
-    .controls, select, option, input {
-      font-size: 25px;
-      margin-top: 10px;
+    .controls input, .controls select {
+      font-size: 18px;
+      margin: 10px;
     }
   </style>
 </head>
 <body>
 <canvas id="canvas1"></canvas>
 <div class="controls">
-  <label for="animations">Choose Animation:</label>
+  <input type="file" id="imageUpload" accept="image/*" />
+  <br>
+  <label for="animations">Animation Type:</label>
   <select id="animations">
-    <option value="idle">Idle</option>
-    <option value="jump">Jump</option>
-    <option value="fall">Fall</option>
-    <option value="run">Run</option>
-    <option value="dizzy">Dizzy</option>
-    <option value="sit">Sit</option>
-    <option value="roll">Roll</option>
-    <option value="bite">Bite</option>
-    <option value="ko">KO</option>
-    <option value="gethit">Get hit</option>
-  </select><br>
-  <input type="file" id="imageUpload" accept="image/*">
+    <option value="bounce">Bounce</option>
+    <option value="slide">Slide</option>
+    <option value="shake">Shake</option>
+    <option value="rotate">Rotate</option>
+  </select>
 </div>
 
 <script>
-let playerState = "idle";
-const dropdown = document.getElementById("animations");
-dropdown.addEventListener("change", function (e) {
+const canvas = document.getElementById("canvas1");
+const ctx = canvas.getContext("2d");
+canvas.width = 600;
+canvas.height = 600;
+
+let img = new Image();
+let imgLoaded = false;
+let playerState = 'bounce';
+let frameCount = 0;
+
+document.getElementById("animations").addEventListener("change", function(e) {
   playerState = e.target.value;
 });
 
-const canvas = document.getElementById("canvas1");
-const ctx = canvas.getContext("2d");
-const CANVAS_WIDTH = canvas.width = 600;
-const CANVAS_HEIGHT = canvas.height = 600;
-
-const playerImage = new Image();
-playerImage.src = "https://www.frankslaboratory.co.uk/downloads/shadow_dog.png"; // default
-
-document.getElementById("imageUpload").addEventListener("change", function (e) {
+document.getElementById("imageUpload").addEventListener("change", function(e) {
   const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      playerImage.src = event.target.result;
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    img.onload = function() {
+      imgLoaded = true;
     };
-    reader.readAsDataURL(file);
-  }
-});
-
-const spriteWidth = 575;
-const spriteHeight = 523;
-
-let gameFrame = 0;
-const staggerFrames = 5;
-const spriteAnimations = [];
-const animationStates = [
-  { name: "idle", frames: 7 },
-  { name: "jump", frames: 7 },
-  { name: "fall", frames: 7 },
-  { name: "run", frames: 9 },
-  { name: "dizzy", frames: 11 },
-  { name: "sit", frames: 5 },
-  { name: "roll", frames: 7 },
-  { name: "bite", frames: 7 },
-  { name: "ko", frames: 12 },
-  { name: "gethit", frames: 4 }
-];
-
-animationStates.forEach((state, index) => {
-  let frames = { loc: [] };
-  for (let j = 0; j < state.frames; j++) {
-    let positionX = j * spriteWidth;
-    let positionY = index * spriteHeight;
-    frames.loc.push({ x: positionX, y: positionY });
-  }
-  spriteAnimations[state.name] = frames;
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
 });
 
 function animate() {
-  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  let position = Math.floor(gameFrame / staggerFrames) % spriteAnimations[playerState].loc.length;
-  let frameX = spriteWidth * position;
-  let frameY = spriteAnimations[playerState].loc[position].y;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (imgLoaded) {
+    let dx = 0, dy = 0, angle = 0, scale = 1;
 
-  ctx.drawImage(playerImage, frameX, frameY, spriteWidth, spriteHeight, 0, 0, spriteWidth, spriteHeight);
+    switch (playerState) {
+      case 'bounce':
+        dy = Math.sin(frameCount * 0.1) * 20;
+        break;
+      case 'slide':
+        dx = Math.sin(frameCount * 0.05) * 40;
+        break;
+      case 'shake':
+        dx = Math.sin(frameCount * 0.5) * 5;
+        dy = Math.cos(frameCount * 0.5) * 5;
+        break;
+      case 'rotate':
+        angle = Math.sin(frameCount * 0.05) * 0.5;
+        break;
+    }
 
-  gameFrame++;
+    ctx.save();
+    ctx.translate(canvas.width / 2 + dx, canvas.height / 2 + dy);
+    if (angle) ctx.rotate(angle);
+    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+    ctx.restore();
+  }
+
+  frameCount++;
   requestAnimationFrame(animate);
 }
 animate();

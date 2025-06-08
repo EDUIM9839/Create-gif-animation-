@@ -37,7 +37,7 @@ let generateGif = () => {
 
                 container.append(iframe);
 
-                // Only Download Button
+                // Download Button
                 let downloadBtn = document.createElement("button");
                 downloadBtn.innerText = "Download GIF";
                 downloadBtn.onclick = () => {

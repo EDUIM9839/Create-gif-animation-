@@ -1,4 +1,4 @@
-//Paste the generated API Key here
+// Paste the generated API Key here
 let apiKey = "kR9lHk7wuV9TQYuRP97zirVFySiOfqYj";
 let submitBtn = document.getElementById("submit-btn");
 
@@ -27,7 +27,7 @@ let generateGif = () => {
 
                 iframe.onload = () => {
                     gifCount--;
-                    if (gifCount == 0) {
+                    if (gifCount === 0) {
                         loader.style.display = "none";
                         document.querySelector(".wrapper").style.display = "flex";
                         document.querySelector(".search-container").style.display = "";
@@ -42,12 +42,19 @@ let generateGif = () => {
                 downloadBtn.innerText = "Download GIF";
                 downloadBtn.onclick = () => {
                     const gifUrl = gif.images.original.url;
-                    const a = document.createElement("a");
-                    a.href = gifUrl;
-                    a.download = `gif-${gif.id}.gif`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
+                    fetch(gifUrl)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `gif-${gif.id}.gif`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        })
+                        .catch(() => alert("Failed to download GIF"));
                 };
                 container.append(downloadBtn);
 
@@ -56,5 +63,5 @@ let generateGif = () => {
         });
 };
 
-// Generate Gifs on screen load or when user clicks on submit
+// Generate GIFs on submit button click
 submitBtn.addEventListener("click", generateGif);

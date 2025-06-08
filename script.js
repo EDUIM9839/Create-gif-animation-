@@ -37,30 +37,7 @@ let generateGif = () => {
 
                 container.append(iframe);
 
-                // Copy Link Button
-                let copyBtn = document.createElement("button");
-                copyBtn.innerText = "Copy Link";
-                copyBtn.onclick = () => {
-                    let copyLink = `https://media4.giphy.com/media/${gif.id}/giphy.mp4`;
-                    navigator.clipboard
-                        .writeText(copyLink)
-                        .then(() => {
-                            alert("GIF copied to clipboard");
-                        })
-                        .catch(() => {
-                            alert("GIF copied to clipboard");
-                            let hiddenInput = document.createElement("input");
-                            hiddenInput.setAttribute("type", "text");
-                            document.body.appendChild(hiddenInput);
-                            hiddenInput.value = copyLink;
-                            hiddenInput.select();
-                            document.execCommand("copy");
-                            document.body.removeChild(hiddenInput);
-                        });
-                };
-                container.append(copyBtn);
-
-                // Download Button
+                // Only Download Button
                 let downloadBtn = document.createElement("button");
                 downloadBtn.innerText = "Download GIF";
                 downloadBtn.onclick = () => {

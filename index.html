@@ -2,134 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Static Image Animation with Dynamic Options</title>
+  <title>Sprite Sheet Generator & Preview</title>
   <style>
-    #canvas1 {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600px;
-      height: 600px;
-    }
-    .controls {
-      position: absolute;
-      z-index: 10;
-      top: 30px;
-      left: 50%;
-      transform: translateX(-50%);
+    body {
+      font-family: sans-serif;
       text-align: center;
+      padding: 20px;
+      background: #f4f4f4;
     }
-    .controls input, .controls select {
-      font-size: 18px;
+    canvas {
+      border: 1px solid #aaa;
       margin: 10px;
+    }
+    #controls {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-<canvas id="canvas1"></canvas>
-<div class="controls">
-  <input type="file" id="imageUpload" accept="image/*" />
-  <br>
-  <label for="animations">Choose Animation:</label>
-  <select id="animations"></select>
-</div>
+  <h2>Static Image → Sprite Sheet + Preview</h2>
+  <div id="controls">
+    <input type="file" id="upload" accept="image/*" />
+  </div>
+  <div>
+    <canvas id="spriteSheet" width="800" height="100"></canvas><br>
+    <strong>Sprite Sheet Output</strong>
+  </div>
+  <div>
+    <canvas id="preview" width="100" height="100"></canvas><br>
+    <strong>Animated Preview</strong>
+  </div>
 
 <script>
-const canvas = document.getElementById("canvas1");
-const ctx = canvas.getContext("2d");
-canvas.width = 600;
-canvas.height = 600;
+const upload = document.getElementById("upload");
+const sheetCanvas = document.getElementById("spriteSheet");
+const previewCanvas = document.getElementById("preview");
+const sheetCtx = sheetCanvas.getContext("2d");
+const previewCtx = previewCanvas.getContext("2d");
 
-let img = new Image();
-let imgLoaded = false;
-let playerState = 'idle';
-let frameCount = 0;
+let spriteFrames = [];
+let currentFrame = 0;
+let spriteWidth = 100;
+let spriteHeight = 100;
+let frameCount = 8; // You can increase this for more variation
 
-// 1. Dynamically add options to the <select>
-const animationList = [
-  "idle", "jump", "fall", "run", "dizzy",
-  "sit", "roll", "bite", "ko", "gethit"
-];
-
-const select = document.getElementById("animations");
-animationList.forEach(anim => {
-  const option = document.createElement("option");
-  option.value = anim;
-  option.textContent = anim.charAt(0).toUpperCase() + anim.slice(1);
-  select.appendChild(option);
-});
-
-// 2. Handle animation selection
-select.addEventListener("change", (e) => {
-  playerState = e.target.value;
-});
-
-// 3. Handle image upload
-document.getElementById("imageUpload").addEventListener("change", function(e) {
+upload.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
+
   const reader = new FileReader();
-  reader.onload = function(evt) {
-    img.onload = function() {
-      imgLoaded = true;
+  reader.onload = function (event) {
+    const img = new Image();
+    img.onload = function () {
+      generateSpriteSheet(img);
+      startAnimation();
     };
-    img.src = evt.target.result;
+    img.src = event.target.result;
   };
   reader.readAsDataURL(file);
 });
 
-// 4. Simulated animation
-function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (imgLoaded) {
-    let dx = 0, dy = 0, angle = 0;
+function generateSpriteSheet(image) {
+  spriteFrames = []; // Reset
+  sheetCtx.clearRect(0, 0, sheetCanvas.width, sheetCanvas.height);
+  const scale = Math.min(spriteWidth / image.width, spriteHeight / image.height);
 
-    switch (playerState) {
-      case 'idle':
-        break;
-      case 'jump':
-        dy = Math.sin(frameCount * 0.1) * -20;
-        break;
-      case 'fall':
-        dy = Math.sin(frameCount * 0.1) * 10;
-        break;
-      case 'run':
-        dx = Math.sin(frameCount * 0.2) * 25;
-        break;
-      case 'dizzy':
-        angle = Math.sin(frameCount * 0.2) * 1;
-        break;
-      case 'sit':
-        ctx.globalAlpha = 0.5;
-        break;
-      case 'roll':
-        angle = frameCount * 0.1;
-        break;
-      case 'bite':
-        dx = Math.sin(frameCount * 0.4) * 10;
-        break;
-      case 'ko':
-        ctx.globalAlpha = 1 - (frameCount % 100) / 100;
-        dy = 20;
-        break;
-      case 'gethit':
-        ctx.globalAlpha = (frameCount % 10 < 5) ? 0.2 : 1;
-        break;
-    }
+  for (let i = 0; i < frameCount; i++) {
+    // Create a canvas for each frame
+    const frameCanvas = document.createElement("canvas");
+    frameCanvas.width = spriteWidth;
+    frameCanvas.height = spriteHeight;
+    const frameCtx = frameCanvas.getContext("2d");
 
-    ctx.save();
-    ctx.translate(canvas.width / 2 + dx, canvas.height / 2 + dy);
-    if (angle) ctx.rotate(angle);
-    ctx.drawImage(img, -img.width / 2, -img.height / 2);
-    ctx.restore();
-    ctx.globalAlpha = 1;
+    frameCtx.save();
+    frameCtx.translate(spriteWidth / 2, spriteHeight / 2);
+
+    // Fake motion: rotate, scale, translate
+    const angle = (i / frameCount) * Math.PI * 2;
+    frameCtx.rotate(Math.sin(angle) * 0.3);
+    frameCtx.scale(1 + Math.sin(angle) * 0.1, 1 + Math.cos(angle) * 0.1);
+    frameCtx.drawImage(
+      image,
+      -image.width * scale / 2,
+      -image.height * scale / 2,
+      image.width * scale,
+      image.height * scale
+    );
+    frameCtx.restore();
+
+    // Save for animation preview
+    spriteFrames.push(frameCanvas);
+
+    // Draw on sprite sheet canvas
+    sheetCtx.drawImage(frameCanvas, i * spriteWidth, 0);
   }
-
-  frameCount++;
-  requestAnimationFrame(animate);
 }
-animate();
+
+function startAnimation() {
+  function animate() {
+    previewCtx.clearRect(0, 0, spriteWidth, spriteHeight);
+    if (spriteFrames.length > 0) {
+      previewCtx.drawImage(spriteFrames[currentFrame], 0, 0);
+      currentFrame = (currentFrame + 1) % frameCount;
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
 </script>
 </body>
 </html>

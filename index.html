@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Horse Sprite Animation</title>
+  <style>
+    canvas {
+      background: #fff;
+      display: block;
+      margin: 20px auto;
+      border: 1px solid #ccc;
+    }
+    select {
+      font-size: 20px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align:center;">Horse Sprite Animation (Simulated)</h2>
+
+<select id="animationType">
+  <option value="idle">Idle</option>
+  <option value="run">Run</option>
+  <option value="jump">Jump</option>
+</select>
+
+<canvas id="canvas1" width="600" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas1");
+const ctx = canvas.getContext("2d");
+
+const horseImg = new Image();
+horseImg.src = "https://i.ibb.co/vw6DM9R/horse-shadow.png"; // 👈 yeh aapki transparent background wali horse image ka link ho (hosted image)
+
+let frame = 0;
+let animation = "idle";
+
+document.getElementById("animationType").addEventListener("change", (e) => {
+  animation = e.target.value;
+});
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let x = 200, y = 200;
+  let scale = 1;
+  let rotation = 0;
+
+  if (animation === "run") {
+    x += Math.sin(frame * 0.2) * 10;
+    y += Math.cos(frame * 0.2) * 5;
+  } else if (animation === "jump") {
+    y += Math.sin(frame * 0.1) * 20;
+  }
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  ctx.scale(scale, scale);
+  ctx.drawImage(horseImg, -horseImg.width / 4, -horseImg.height / 4, horseImg.width / 2, horseImg.height / 2);
+  ctx.restore();
+
+  frame++;
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Image to GIF </title>
+  <title>Image to GIF</title>
   <style>
     body {
       font-family: sans-serif;
@@ -21,7 +21,7 @@
   </style>
 </head>
 <body>
-  <h2>Upload Images → Generate GIF</h2>
+  <h2>Upload Images → Generate GIF 2</h2>
   <input type="file" id="upload" accept="image/*" multiple />
   <br />
   <button onclick="createGIF()">Generate GIF</button>
@@ -30,17 +30,26 @@
 
   <!-- Include gif.js and worker -->
   <script src="https://unpkg.com/gif.js.optimized/dist/gif.js"></script>
-  <script src="https://unpkg.com/gif.js.optimized/dist/gif.worker.js"></script>
-
   <script>
     const upload = document.getElementById('upload');
     const result = document.getElementById('result');
     let images = [];
 
+    // Handle file selection
     upload.addEventListener('change', (e) => {
       images = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name));
     });
 
+    // Load image helper
+    function loadImage(src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.src = src;
+      });
+    }
+
+    // Create GIF from images
     async function createGIF() {
       if (images.length === 0) {
         alert('Please upload some images first.');
@@ -52,6 +61,7 @@
         quality: 10,
         width: 300,
         height: 300,
+        workerScript: 'https://unpkg.com/gif.js.optimized/dist/gif.worker.js' // Explicit worker path
       });
 
       for (const file of images) {
@@ -64,14 +74,6 @@
       });
 
       gif.render();
-    }
-
-    function loadImage(src) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.src = src;
-      });
     }
   </script>
 </body>

@@ -1,163 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Dynamic Sprite Sheet Generator</title>
+  <meta charset="UTF-8">
+  <title>Sprite Animation with Upload</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-      background: #f4f4f4;
+    #canvas1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
     }
-    canvas {
-      border: 1px solid #aaa;
-      margin: 10px;
+    .controls {
+      position: absolute;
+      z-index: 10;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
     }
-    #controls {
-      margin-bottom: 20px;
-    }
-    select, input {
-      font-size: 18px;
-      margin: 10px;
+    .controls, select, option, input {
+      font-size: 25px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h2>Static Image → Sprite Sheet + Animation</h2>
-  <div id="controls">
-    <input type="file" id="upload" accept="image/*" />
-    <select id="animationStyle">
-      <option value="idle">Idle</option>
-      <option value="run">Run</option>
-      <option value="jump">Jump</option>
-      <option value="dizzy">Dizzy</option>
-      <option value="sit">Sit</option>
-      <option value="roll">Roll</option>
-      <option value="bite">Bite</option>
-      <option value="ko">KO</option>
-      <option value="gethit">Get Hit</option>
-    </select>
-  </div>
-  <canvas id="spriteSheet" width="800" height="100"></canvas><br>
-  <canvas id="preview" width="100" height="100"></canvas>
+<canvas id="canvas1"></canvas>
+<div class="controls">
+  <label for="animations">Choose Animation:</label>
+  <select id="animations">
+    <option value="idle">Idle</option>
+    <option value="jump">Jump</option>
+    <option value="fall">Fall</option>
+    <option value="run">Run</option>
+    <option value="dizzy">Dizzy</option>
+    <option value="sit">Sit</option>
+    <option value="roll">Roll</option>
+    <option value="bite">Bite</option>
+    <option value="ko">KO</option>
+    <option value="gethit">Get hit</option>
+  </select><br>
+  <input type="file" id="imageUpload" accept="image/*">
+</div>
 
 <script>
-const upload = document.getElementById("upload");
-const animationStyle = document.getElementById("animationStyle");
-const sheetCanvas = document.getElementById("spriteSheet");
-const previewCanvas = document.getElementById("preview");
-const sheetCtx = sheetCanvas.getContext("2d");
-const previewCtx = previewCanvas.getContext("2d");
+let playerState = "idle";
+const dropdown = document.getElementById("animations");
+dropdown.addEventListener("change", function (e) {
+  playerState = e.target.value;
+});
 
-let spriteFrames = [];
-let currentFrame = 0;
-let spriteWidth = 100;
-let spriteHeight = 100;
-let frameCount = 8;
-let selectedImage = null;
-let frameDelay = 0;
-const delayFrames = 8; // Slower animation
+const canvas = document.getElementById("canvas1");
+const ctx = canvas.getContext("2d");
+const CANVAS_WIDTH = canvas.width = 600;
+const CANVAS_HEIGHT = canvas.height = 600;
 
-upload.addEventListener("change", (e) => {
+const playerImage = new Image();
+playerImage.src = "https://www.frankslaboratory.co.uk/downloads/shadow_dog.png"; // default
+
+document.getElementById("imageUpload").addEventListener("change", function (e) {
   const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function (event) {
-    const img = new Image();
-    img.onload = function () {
-      selectedImage = img;
-      generateSpriteSheet();
-      startAnimation();
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      playerImage.src = event.target.result;
     };
-    img.src = event.target.result;
-  };
-  reader.readAsDataURL(file);
-});
-
-animationStyle.addEventListener("change", () => {
-  if (selectedImage) {
-    generateSpriteSheet();
+    reader.readAsDataURL(file);
   }
 });
 
-function generateSpriteSheet() {
-  spriteFrames = [];
-  sheetCtx.clearRect(0, 0, sheetCanvas.width, sheetCanvas.height);
-  const effect = animationStyle.value;
-  const img = selectedImage;
-  const scale = Math.min(spriteWidth / img.width, spriteHeight / img.height);
+const spriteWidth = 575;
+const spriteHeight = 523;
 
-  for (let i = 0; i < frameCount; i++) {
-    const frameCanvas = document.createElement("canvas");
-    frameCanvas.width = spriteWidth;
-    frameCanvas.height = spriteHeight;
-    const frameCtx = frameCanvas.getContext("2d");
+let gameFrame = 0;
+const staggerFrames = 5;
+const spriteAnimations = [];
+const animationStates = [
+  { name: "idle", frames: 7 },
+  { name: "jump", frames: 7 },
+  { name: "fall", frames: 7 },
+  { name: "run", frames: 9 },
+  { name: "dizzy", frames: 11 },
+  { name: "sit", frames: 5 },
+  { name: "roll", frames: 7 },
+  { name: "bite", frames: 7 },
+  { name: "ko", frames: 12 },
+  { name: "gethit", frames: 4 }
+];
 
-    frameCtx.save();
-    frameCtx.translate(spriteWidth / 2, spriteHeight / 2);
-
-    const angle = (i / frameCount) * Math.PI * 2;
-    switch (effect) {
-      case "idle":
-        break;
-      case "run":
-        frameCtx.translate(Math.sin(angle) * 10, 0);
-        break;
-      case "jump":
-        frameCtx.translate(0, -Math.abs(Math.sin(angle) * 15));
-        break;
-      case "dizzy":
-        frameCtx.rotate(angle);
-        break;
-      case "sit":
-        frameCtx.scale(1, 0.7);
-        break;
-      case "roll":
-        frameCtx.rotate(angle);
-        frameCtx.scale(1 + Math.sin(angle) * 0.1, 1);
-        break;
-      case "bite":
-        frameCtx.translate(Math.sin(angle * 2) * 5, 0);
-        frameCtx.scale(1.1, 1.1);
-        break;
-      case "ko":
-        frameCtx.rotate(1.5);
-        frameCtx.globalAlpha = 1 - (i / frameCount);
-        break;
-      case "gethit":
-        frameCtx.translate(Math.sin(angle * 10) * 4, 0);
-        break;
-    }
-
-    frameCtx.drawImage(
-      img,
-      -img.width * scale / 2,
-      -img.height * scale / 2,
-      img.width * scale,
-      img.height * scale
-    );
-
-    frameCtx.restore();
-    spriteFrames.push(frameCanvas);
-    sheetCtx.drawImage(frameCanvas, i * spriteWidth, 0);
+animationStates.forEach((state, index) => {
+  let frames = { loc: [] };
+  for (let j = 0; j < state.frames; j++) {
+    let positionX = j * spriteWidth;
+    let positionY = index * spriteHeight;
+    frames.loc.push({ x: positionX, y: positionY });
   }
-}
+  spriteAnimations[state.name] = frames;
+});
 
-function startAnimation() {
-  function animate() {
-    previewCtx.clearRect(0, 0, spriteWidth, spriteHeight);
-    if (spriteFrames.length > 0) {
-      previewCtx.drawImage(spriteFrames[currentFrame], 0, 0);
-      if (frameDelay++ >= delayFrames) {
-        currentFrame = (currentFrame + 1) % frameCount;
-        frameDelay = 0;
-      }
-    }
-    requestAnimationFrame(animate);
-  }
-  animate();
+function animate() {
+  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  let position = Math.floor(gameFrame / staggerFrames) % spriteAnimations[playerState].loc.length;
+  let frameX = spriteWidth * position;
+  let frameY = spriteAnimations[playerState].loc[position].y;
+
+  ctx.drawImage(playerImage, frameX, frameY, spriteWidth, spriteHeight, 0, 0, spriteWidth, spriteHeight);
+
+  gameFrame++;
+  requestAnimationFrame(animate);
 }
+animate();
 </script>
 </body>
 </html>

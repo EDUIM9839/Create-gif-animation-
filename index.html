@@ -2,31 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sprite Animation with Upload</title>
+  <title>Sprite Animation Upload</title>
   <style>
-    #canvas1 {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600px;
-      height: 600px;
+    body {
+      margin: 0;
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    canvas {
+      border: 2px solid white;
+      margin-top: 20px;
     }
     .controls {
-      position: absolute;
-      z-index: 10;
-      top: 100px;
-      left: 50%;
-      transform: translateX(-50%);
+      margin-top: 20px;
     }
-    .controls, select, option, input {
-      font-size: 25px;
-      margin-top: 10px;
+    select, input {
+      font-size: 20px;
+      margin: 10px;
     }
   </style>
 </head>
 <body>
-<canvas id="canvas1"></canvas>
+
 <div class="controls">
   <label for="animations">Choose Animation:</label>
   <select id="animations">
@@ -40,42 +39,27 @@
     <option value="bite">Bite</option>
     <option value="ko">KO</option>
     <option value="gethit">Get hit</option>
-  </select><br>
+  </select>
+  <br>
   <input type="file" id="imageUpload" accept="image/*">
 </div>
 
-<script>
-let playerState = "idle";
-const dropdown = document.getElementById("animations");
-dropdown.addEventListener("change", function (e) {
-  playerState = e.target.value;
-});
+<canvas id="canvas1" width="600" height="600"></canvas>
 
+<script>
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
-const CANVAS_WIDTH = canvas.width = 600;
-const CANVAS_HEIGHT = canvas.height = 600;
 
-const playerImage = new Image();
+let playerImage = new Image();
 playerImage.src = "https://www.frankslaboratory.co.uk/downloads/shadow_dog.png"; // default
 
-document.getElementById("imageUpload").addEventListener("change", function (e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      playerImage.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-const spriteWidth = 575;
-const spriteHeight = 523;
-
+let playerState = "idle";
+let spriteWidth = 575;
+let spriteHeight = 523;
+let spriteAnimations = {};
+let staggerFrames = 5;
 let gameFrame = 0;
-const staggerFrames = 5;
-const spriteAnimations = [];
+
 const animationStates = [
   { name: "idle", frames: 7 },
   { name: "jump", frames: 7 },
@@ -89,28 +73,71 @@ const animationStates = [
   { name: "gethit", frames: 4 }
 ];
 
-animationStates.forEach((state, index) => {
-  let frames = { loc: [] };
-  for (let j = 0; j < state.frames; j++) {
-    let positionX = j * spriteWidth;
-    let positionY = index * spriteHeight;
-    frames.loc.push({ x: positionX, y: positionY });
+function buildSpriteData(image) {
+  const maxFrames = Math.max(...animationStates.map(a => a.frames));
+  spriteWidth = image.width / maxFrames;
+  spriteHeight = image.height / animationStates.length;
+
+  spriteAnimations = {};
+  animationStates.forEach((state, index) => {
+    let frames = { loc: [] };
+    for (let j = 0; j < state.frames; j++) {
+      frames.loc.push({
+        x: j * spriteWidth,
+        y: index * spriteHeight
+      });
+    }
+    spriteAnimations[state.name] = frames;
+  });
+}
+
+document.getElementById("animations").addEventListener("change", e => {
+  playerState = e.target.value;
+});
+
+document.getElementById("imageUpload").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const img = new Image();
+      img.onload = () => {
+        playerImage = img;
+
+        // If it's a full sprite sheet, use logic, else treat as single frame (fallback)
+        if (img.height > 1.5 * img.width / Math.max(...animationStates.map(a => a.frames))) {
+          buildSpriteData(img);
+        } else {
+          // fallback: make a fake sprite animation with 1 row of 6 frames
+          spriteWidth = img.width / 6;
+          spriteHeight = img.height;
+          spriteAnimations = {
+            [playerState]: { loc: Array.from({ length: 6 }, (_, i) => ({ x: i * spriteWidth, y: 0 })) }
+          };
+        }
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   }
-  spriteAnimations[state.name] = frames;
 });
 
 function animate() {
-  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  let position = Math.floor(gameFrame / staggerFrames) % spriteAnimations[playerState].loc.length;
-  let frameX = spriteWidth * position;
-  let frameY = spriteAnimations[playerState].loc[position].y;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const animation = spriteAnimations[playerState] || spriteAnimations["idle"];
+  const position = Math.floor(gameFrame / staggerFrames) % animation.loc.length;
+  const frameX = animation.loc[position].x;
+  const frameY = animation.loc[position].y;
 
   ctx.drawImage(playerImage, frameX, frameY, spriteWidth, spriteHeight, 0, 0, spriteWidth, spriteHeight);
 
   gameFrame++;
   requestAnimationFrame(animate);
 }
+
+playerImage.onload = () => buildSpriteData(playerImage);
 animate();
 </script>
+
 </body>
 </html>

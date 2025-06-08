@@ -21,7 +21,7 @@
   </style>
 </head>
 <body>
-  <h2>Upload Images → Generate GIF 2</h2>
+  <h2>Upload Images → Generate GIF </h2>
   <input type="file" id="upload" accept="image/*" multiple />
   <br />
   <button onclick="createGIF()">Generate GIF</button>
@@ -35,21 +35,26 @@
     const result = document.getElementById('result');
     let images = [];
 
-    // Handle file selection
     upload.addEventListener('change', (e) => {
       images = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name));
     });
 
-    // Load image helper
-    function loadImage(src) {
+    function loadImageToCanvas(file, width, height) {
       return new Promise((resolve) => {
         const img = new Image();
-        img.onload = () => resolve(img);
-        img.src = src;
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas);
+        };
+        img.src = URL.createObjectURL(file);
       });
     }
 
-    // Create GIF from images
     async function createGIF() {
       if (images.length === 0) {
         alert('Please upload some images first.');
@@ -61,16 +66,18 @@
         quality: 10,
         width: 300,
         height: 300,
-        workerScript: 'https://unpkg.com/gif.js.optimized/dist/gif.worker.js' // Explicit worker path
+        workerScript: 'https://unpkg.com/gif.js.optimized/dist/gif.worker.js'
       });
 
       for (const file of images) {
-        const img = await loadImage(URL.createObjectURL(file));
-        gif.addFrame(img, { delay: 200 });
+        const canvas = await loadImageToCanvas(file, 300, 300);
+        gif.addFrame(canvas, { delay: 200 });
       }
 
       gif.on('finished', (blob) => {
-        result.src = URL.createObjectURL(blob);
+        const gifUrl = URL.createObjectURL(blob);
+        result.src = gifUrl;
+        console.log('GIF generated:', gifUrl);
       });
 
       gif.render();

@@ -21,15 +21,16 @@
   </style>
 </head>
 <body>
-  <h2>Upload Images → Generate GIF 2</h2>
+  <h2>Upload Images → Generate GIF</h2>
   <input type="file" id="upload" accept="image/*" multiple />
   <br />
   <button onclick="createGIF()">Generate GIF</button>
   <br />
-  <img id="result" alt="Generated GIF will appear here" />
+  <img id="result" alt="Generated GIF will appear here" style="display:none;" />
 
-  <!-- Include gif.js and worker -->
-  <script src="https://unpkg.com/gif.js.optimized/dist/gif.js"></script>
+  <!-- Include gif.js -->
+  <script src="https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.js"></script>
+
   <script>
     const upload = document.getElementById('upload');
     const result = document.getElementById('result');
@@ -42,13 +43,13 @@
     function loadImageToCanvas(file, width, height) {
       return new Promise((resolve) => {
         const img = new Image();
-        img.crossOrigin = 'anonymous';
         img.onload = () => {
           const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
+          URL.revokeObjectURL(img.src); // Cleanup
           resolve(canvas);
         };
         img.src = URL.createObjectURL(file);
@@ -66,12 +67,12 @@
         quality: 10,
         width: 300,
         height: 300,
-        workerScript: 'https://unpkg.com/gif.js.optimized/dist/gif.worker.js'
+        workerScript: 'https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.worker.js'
       });
 
       for (const file of images) {
         const canvas = await loadImageToCanvas(file, 300, 300);
-        gif.addFrame(canvas, { delay: 500 }); // 500ms = 0.5s per frame
+        gif.addFrame(canvas, { delay: 500 }); // 0.5s per frame
       }
 
       gif.on('finished', function(blob) {

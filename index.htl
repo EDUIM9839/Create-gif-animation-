@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Storybook</title>
+	<script> document.documentElement.classList.remove("no-js")	</script>
+<title>shuttlecraft landing</title>
+<style type="text/css" media="screen">
+body {
+    width: 100vw;
+    height: 100vh;
+	margin: 0;
+	background-color: #112;
+	overflow: hidden;
+}
+h1 {
+color: #fcf;
+font-size: 3rem;
+margin-left: 2vw;
+}
+.starfield {
+    content: ' ';
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+	/*z-index: -1;*/
+	/*background-color: #121;*/
+    /*opacity: 0.7;*/
+    background-image: url("./Images/AsteroidZoomIn1.jpg");
+	background-position: center;
+    background-repeat: no-repeat;
+    -ms-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+}
+#tenbytenSquareOrange {
+	position: absolute;
+	z-index: 5;
+	top: 23vh;
+	left: 23vw;
+	animation: 1s linear 0s infinite blink;
+}
+@keyframes blink {
+    0% {
+        opacity:1;
+    }
+    70% {
+        opacity:0;
+    }
+    100% {
+        opacity:1;
+    }
+}
+#tenbytenSquare {
+	position: absolute;
+	z-index: 5;
+	top: 23vh;
+	left: 23vw;
+	animation: 1s linear 0s infinite blink2;
+}
+@keyframes blink2 {
+    0% {
+        opacity:1;
+    }
+    70% {
+        opacity:0;
+    }
+    100% {
+        opacity:1;
+    }
+}
+
+#shuttlecraft {
+	position: absolute;
+    top: 76vh;
+	left: 100vw;
+	z-index: 5;
+	--startX: 90vw;
+	--endX: 13vw;
+	--startY: 76vh;
+	--endY: 13vh;
+	--startScale: 1.5;
+	--endScale: .1;
+	--stepCount: 20;
+	--StepSizeX: calc((var(--startX) - var(--endX)) / var(--stepCount));
+	--StepSizeY: calc((var(--startY) - var(--endY)) / var(--stepCount));
+	--StepSizeScale: calc((var(--startScale) - var(--endScale)) / var(--stepCount));
+	animation: 4s linear 0s 1 flyby;
+}	
+@keyframes flyby {
+0% {
+	left: calc(var(--startX));
+    top: calc(var(--startY));
+	transform: scale(calc(var(--startScale)));
+}
+5% {
+	left: calc(var(--startX) - var(--StepSizeX));
+    top: calc(var(--startY) - var(--StepSizeY));
+	transform: scale(calc(var(--startScale) - var(--StepSizeScale)));
+  }
+10% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 2)) ;
+    top: calc(var(--startY) - (var(--StepSizeY) * 2));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 2)));
+  }
+15% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 3));
+    top: calc(var(--startY) - (var(--StepSizeY) * 3));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 3)));
+  }
+20% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 4));
+    top: calc(var(--startY) - (var(--StepSizeY) * 4));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 4)));
+ }
+25% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 5));
+    top: calc(var(--startY) - (var(--StepSizeY) * 5));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 5)));
+ }
+30% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 6));
+    top: calc(var(--startY) - (var(--StepSizeY) * 6));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 6)));
+  }
+35% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 7));
+    top: calc(var(--startY) - (var(--StepSizeY) * 7));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 7)));
+  }
+40% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 8));
+    top: calc(var(--startY) - (var(--StepSizeY) * 8));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 8)));
+  }
+45% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 9));
+    top: calc(var(--startY) - (var(--StepSizeY) * 9));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 9)));
+  }
+50% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 10));
+    top: calc(var(--startY) - (var(--StepSizeY) * 10));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 10)));
+  }
+55% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 11));
+    top: calc(var(--startY) - (var(--StepSizeY) * 11));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 11)));
+  }
+60% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 12));
+    top: calc(var(--startY) - (var(--StepSizeY) * 12));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 12)));
+  }
+705% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 13));
+    top: calc(var(--startY) - (var(--StepSizeY) * 13));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 13)));
+  }
+75% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 14));
+    top: calc(var(--startY) - (var(--StepSizeY) * 14));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 14)));
+}
+80% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 15));
+    top: calc(var(--startY) - (var(--StepSizeY) * 15));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 15)));
+}
+85% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 16));
+    top: calc(var(--startY) - (var(--StepSizeY) * 16));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 16)));
+}
+90% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 17));
+    top: calc(var(--startY) - (var(--StepSizeY) * 17));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 17)));
+}
+95% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 18));
+    top: calc(var(--startY) - (var(--StepSizeY) * 18));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 18)));
+}
+100% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 19));
+    top: calc(var(--startY) - (var(--StepSizeY) * 19));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 19)));
+}
+}
+.midapproach {
+    content: ' ';
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+	z-index: -1;
+	/*background-color: #121;*/
+    /*opacity: 0.7;*/
+    background-image: url("./Images/AsteroidZoomIn2.jpg");
+	background-position: center;
+    background-repeat: no-repeat;
+    -ms-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+}
+#shuttlecraftMidapproach {
+	position: absolute;
+    top: 76vh;
+	left: 100vw;
+	padding: 1vw;
+	z-index: 5;
+	--startX: 90vw;
+	--endX: 15vw;
+	--startY: 76vh;
+	--endY: 15vh;
+	--startScale: 1.5;
+	--endScale: .1;
+	--stepCount: 20;
+	--StepSizeX: calc((var(--startX) - var(--endX)) / var(--stepCount));
+	--StepSizeY: calc((var(--startY) - var(--endY)) / var(--stepCount));
+	--StepSizeScale: calc((var(--startScale) - var(--endScale)) / var(--stepCount));
+	animation: 3s linear 0s 1 flyby2;
+}	
+@keyframes flyby2 {
+0% {
+	left: calc(var(--startX));
+    top: calc(var(--startY));
+	transform: scale(calc(var(--startScale)));
+}
+5% {
+	left: calc(var(--startX) - var(--StepSizeX));
+    top: calc(var(--startY) - var(--StepSizeY));
+	transform: scale(calc(var(--startScale) - var(--StepSizeScale)));
+  }
+10% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 2)) ;
+    top: calc(var(--startY) - (var(--StepSizeY) * 2));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 2)));
+  }
+15% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 3));
+    top: calc(var(--startY) - (var(--StepSizeY) * 3));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 3)));
+  }
+20% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 4));
+    top: calc(var(--startY) - (var(--StepSizeY) * 4));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 4)));
+ }
+25% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 5));
+    top: calc(var(--startY) - (var(--StepSizeY) * 5));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 5)));
+ }
+30% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 6));
+    top: calc(var(--startY) - (var(--StepSizeY) * 6));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 6)));
+  }
+35% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 7));
+    top: calc(var(--startY) - (var(--StepSizeY) * 7));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 7)));
+  }
+40% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 8));
+    top: calc(var(--startY) - (var(--StepSizeY) * 8));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 8)));
+  }
+45% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 9));
+    top: calc(var(--startY) - (var(--StepSizeY) * 9));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 9)));
+  }
+50% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 10));
+    top: calc(var(--startY) - (var(--StepSizeY) * 10));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 10)));
+  }
+55% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 11));
+    top: calc(var(--startY) - (var(--StepSizeY) * 11));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 11)));
+  }
+60% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 12));
+    top: calc(var(--startY) - (var(--StepSizeY) * 12));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 12)));
+  }
+705% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 13));
+    top: calc(var(--startY) - (var(--StepSizeY) * 13));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 13)));
+  }
+75% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 14));
+    top: calc(var(--startY) - (var(--StepSizeY) * 14));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 14)));
+}
+80% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 15));
+    top: calc(var(--startY) - (var(--StepSizeY) * 15));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 15)));
+}
+85% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 16));
+    top: calc(var(--startY) - (var(--StepSizeY) * 16));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 16)));
+}
+90% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 17));
+    top: calc(var(--startY) - (var(--StepSizeY) * 17));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 17)));
+}
+95% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 18));
+    top: calc(var(--startY) - (var(--StepSizeY) * 18));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 18)));
+}
+100% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 19));
+    top: calc(var(--startY) - (var(--StepSizeY) * 19));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 19)));
+}
+}
+.deceleration {
+    content: ' ';
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+	z-index: -1;
+	/*background-color: #121;*/
+    /*opacity: 0.7;*/
+    background-image: url("./Images/AsteroidZoomIn3.jpg");
+	background-position: center;
+    background-repeat: no-repeat;
+    -ms-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+}
+#shuttlecraftDeceleration {
+	position: absolute;
+    top: 76vh;
+	left: 100vw;
+	padding: 1vw;
+	z-index: 5;
+	--startX: 90vw;
+	--endX: 19vw;
+	--startY: 76vh;
+	--endY: 19vh;
+	--startScale: 1.5;
+	--endScale: .1;
+	--stepCount: 20;
+	--StepSizeX: calc((var(--startX) - var(--endX)) / var(--stepCount));
+	--StepSizeY: calc((var(--startY) - var(--endY)) / var(--stepCount));
+	--StepSizeScale: calc((var(--startScale) - var(--endScale)) / var(--stepCount));
+	animation: 3s linear 0s 1 flyby3;
+}	
+@keyframes flyby3 {
+0% {
+	left: calc(var(--startX));
+    top: calc(var(--startY));
+	transform: scale(calc(var(--startScale)));
+}
+5% {
+	left: calc(var(--startX) - var(--StepSizeX));
+    top: calc(var(--startY) - var(--StepSizeY));
+	transform: scale(calc(var(--startScale) - var(--StepSizeScale)));
+  }
+10% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 2)) ;
+    top: calc(var(--startY) - (var(--StepSizeY) * 2));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 2)));
+  }
+15% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 3));
+    top: calc(var(--startY) - (var(--StepSizeY) * 3));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 3)));
+  }
+20% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 4));
+    top: calc(var(--startY) - (var(--StepSizeY) * 4));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 4)));
+ }
+25% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 5));
+    top: calc(var(--startY) - (var(--StepSizeY) * 5));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 5)));
+ }
+30% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 6));
+    top: calc(var(--startY) - (var(--StepSizeY) * 6));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 6)));
+  }
+35% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 7));
+    top: calc(var(--startY) - (var(--StepSizeY) * 7));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 7)));
+  }
+40% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 8));
+    top: calc(var(--startY) - (var(--StepSizeY) * 8));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 8)));
+  }
+45% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 9));
+    top: calc(var(--startY) - (var(--StepSizeY) * 9));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 9)));
+  }
+50% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 10));
+    top: calc(var(--startY) - (var(--StepSizeY) * 10));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 10)));
+  }
+55% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 11));
+    top: calc(var(--startY) - (var(--StepSizeY) * 11));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 11)));
+  }
+60% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 12));
+    top: calc(var(--startY) - (var(--StepSizeY) * 12));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 12)));
+  }
+705% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 13));
+    top: calc(var(--startY) - (var(--StepSizeY) * 13));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 13)));
+  }
+75% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 14));
+    top: calc(var(--startY) - (var(--StepSizeY) * 14));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 14)));
+}
+80% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 15));
+    top: calc(var(--startY) - (var(--StepSizeY) * 15));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 15)));
+}
+85% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 16));
+    top: calc(var(--startY) - (var(--StepSizeY) * 16));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 16)));
+}
+90% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 17));
+    top: calc(var(--startY) - (var(--StepSizeY) * 17));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 17)));
+}
+95% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 18));
+    top: calc(var(--startY) - (var(--StepSizeY) * 18));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 18)));
+}
+100% {
+	left: calc(var(--startX) - (var(--StepSizeX) * 19));
+    top: calc(var(--startY) - (var(--StepSizeY) * 19));
+	transform: scale(calc(var(--startScale) - (var(--StepSizeScale) * 19)));
+}
+}
+#tenbytenSquareOrangeBig {
+	position: absolute;
+	z-index: 5;
+	top: 23vh;
+	left: 23vw;
+	animation: 1s linear 0s infinite blink3;
+}
+@keyframes blink3 {
+    0% {
+        opacity:1;
+    }
+    70% {
+        opacity:0;
+    }
+    100% {
+        opacity:1;
+    }
+}
+#tenbytenSquareBig {
+	position: absolute;
+	z-index: 5;
+	top: 23vh;
+	left: 23vw;
+	animation: 1s linear 0s infinite blink4;
+}
+@keyframes blink4 {
+    0% {
+        opacity:1;
+    }
+    70% {
+        opacity:0;
+    }
+    100% {
+        opacity:1;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="starfield"><h1>Shuttlecraft</h1></div>
+	<div id="tenbytenSquareOrange"><img src="./Images/tenbytenSquareOrange.jpg" width="15px" height="15px"></div>
+	<div id="tenbytenSquare"><img src="./Images/tenbytenSquare.jpg" width="15px" height="15px"></div>
+	<div id="shuttlecraft"><img src="./Images/shuttlecraft.gif" width="600px" height="487px"></div></div>
+<div class="midapproach"></div>
+	<div id="shuttlecraftMidapproach"><img src="./Images/shuttlecraftPlain.png" width="217px" height="159px"></div>
+<div class="deceleration"></div>
+	<div id="tenbytenSquareOrangeBig"><img src="./Images/tenbytenSquareOrange.jpg" width="25px" height="25px"></div>
+	<div id="tenbytenSquareBig"><img src="./Images/tenbytenSquare.jpg" width="25px" height="25px"></div>
+	<div id="shuttlecraftDeceleration"><img src="./Images/shuttlecraftDeceleration.gif" width="206px" height="143px"></div>
+
+<script src="./js/jquery-3.5.1.min.js"></script>
+<script>
+$(document).ready(function () {
+	// Run the timeline
+  var showVPDetails = 0;
+  setTimeout(function () {$(".starfield").show(0);}, 0);
+  setTimeout(function () {$("#tenbytenSquareOrange").show(0);}, 0);
+  setTimeout(function () {$("#tenbytenSquare").hide(0);}, 0);
+  setTimeout(function () {$("#tenbytenSquareOrangeBig").hide(0);}, 0);
+  setTimeout(function () {$("#tenbytenSquareBig").hide(0);}, 0);
+  setTimeout(function () {$(".midapproach").hide(0);}, 0);
+  setTimeout(function () {$(".deceleration").hide(0);}, 0);
+  setTimeout(function () {$("#shuttlecraftMidapproach").hide(0);}, 0);
+  setTimeout(function () {$("#shuttlecraftDeceleration").hide(0);}, 0);
+
+	// scale the images to suit the viewport and keep aspect
+	// comment out the console.log messages once you figure it out
+	$(window).resize(function() {
+ if(showVPDetails == 1) {
+  var viewportWidth = $(window).width();
+  var vpWidth = parseInt(viewportWidth);
+    var fontSize = '3vw';
+    if(vpWidth <= 840) { fontSize = '5vw' } else { fontSize = '2vw' };
+	$("body").append('<div id="viewport-size" style="display:block;color:#fff;background:#08F;position:fixed;top:0;left:0;font-size:' + fontSize + ';z-index:20;"></div>');
+  var viewportHeight = $(window).height();
+  var VPaspectRatio = viewportWidth / viewportHeight;
+	var VPaspectRounded = (Math.round(VPaspectRatio * 100)) / 100;
+	  // console.info("rounded VP aspect " + VPaspectRounded);
+	$("#viewport-size").html('<div class="dimensions">' + viewportWidth + ' &times; ' + viewportHeight + ' px &amp; w/h = ' + 		VPaspectRounded + ' </div>');
+ }
+		var viewportWidth = $(window).width();
+		var viewportHeight = $(window).height();
+		var VPaspectRatio = viewportWidth / viewportHeight;
+		var VPaspectRounded = Math.round((VPaspectRatio * 100) / 100);
+		  // console.info("rounded VP aspect " + VPaspectRounded);
+		var id = 0;
+		var elWidth = 0;
+		var elHeight = 0;
+		scale = 1;
+		var imgCount = 0;
+		// get total image count
+		var matched = $("img");
+		var imgCount = matched.length;
+		// console.log("Number of images = " + imgCount);
+
+		// loop through each image and tag it with an "id"
+	   $("img").each(function(index,value) {
+		  this.setAttribute("id", index);
+		  // get the image dimensions, faster to have sizes already specified
+		  var elWidth = this.getAttribute("width");
+		  // console.info("eW "+ this.getAttribute("width"));
+		  if (elWidth == null) {
+			var elWidth = this.naturalWidth;
+		  // console.info("nW "+elWidth);
+		  }
+		  var elHeight = this.getAttribute("height");
+			// console.info("eH "+ this.getAttribute("height"));
+		  if (elHeight == null) {
+			var elHeight = this.naturalHeight;
+			// console.info("nW "+ elHeight);
+		  }
+		  var imgSize = "Img Size: " + elWidth + " X " + elHeight;
+		  // console.log(imgSize);
+		  // checkpoint for zero height image
+			if (elHeight == 0) {return};
+			 elWidth = parseInt(elWidth);
+			 elHeight = parseInt(elHeight);
+			 viewportWidth = parseInt(viewportWidth);
+			 viewportHeight = parseInt(viewportHeight);
+			 console.info("eW "+elWidth);
+			 console.info("eH "+elHeight);
+			 // console.info("vW "+viewportWidth);
+			 // console.info("vH "+viewportHeight);
+			var aspect = elWidth/elHeight;
+			var aspectRounded = (Math.round(aspect * 100)) / 100;
+			 // console.info("rounded img aspect " + aspectRounded);
+			var widthRatio = viewportWidth / elWidth;
+			var heightRatio = viewportHeight / elHeight;
+			 // console.info("wR "+widthRatio);
+			 // console.info("hR "+heightRatio);
+			 // default to the width ratio until proven wrong
+			var scale = widthRatio;
+			if (widthRatio * elHeight > viewportHeight) {
+				scale = heightRatio;};
+			//  console.info("\nwR "+widthRatio);
+			//  console.info("hR "+heightRatio);
+			//  console.info("scale "+scale);
+			//  scale = scale * .98;
+			  console.info("finalscale " + scale);
+			var scaleRounded = (Math.round(scale * 100)) / 100;
+			//  console.info("rounded scale " + scaleRounded);
+			//  fit the content into the window
+			var hsize  = Math.round(elWidth * (scale * (elWidth / 1700)));
+			var vsize = Math.round(elHeight * (scale * (elHeight / 1700)));
+			 console.info ("hsize "+hsize);
+			 console.info ("vsize "+vsize);
+		  // finally set the scaled image width and height attributes
+			this.setAttribute("width", hsize);
+			this.setAttribute("height", vsize);
+		});
+	}).trigger('resize');
+
+    setTimeout(function () {$("#tenbytenSquare").hide(0);}, 0);
+    setTimeout(function () {$("#tenbytenSquareOrange").show(0);}, 0);
+    setTimeout(function () {$("#shuttlecraft").show(0);}, 0);
+    setTimeout(function () {$("#tenbytenSquare").show(0);}, 2000);
+    setTimeout(function () {$("#tenbytenSquareOrange").hide(0);}, 2000);
+    setTimeout(function () {$("#shuttlecraft").hide(0);}, 4000);
+    setTimeout(function () {$(".starfield").hide(0);}, 4000);
+    setTimeout(function () {$("#tenbytenSquare").hide(0);}, 4000);
+    setTimeout(function () {$("#tenbytenSquareBig").show(0);}, 4000);
+	setTimeout(function () {$(".midapproach").show(0);}, 4000);
+	setTimeout(function () {$("#shuttlecraftMidapproach").show(0);}, 4000);
+	setTimeout(function () {$("#shuttlecraftMidapproach").hide(0);}, 6900);
+	setTimeout(function () {$(".midapproach").hide(0);}, 6900);
+	setTimeout(function () {$(".deceleration").show(0);}, 6900);
+	setTimeout(function () {$("#shuttlecraftDeceleration").show(0);}, 6900);
+	setTimeout(function () {$("#shuttlecraftDeceleration").hide(0);}, 9900);
+    setTimeout(function () {$("#tenbytenSquareBig").hide(0);}, 10500);
+    setTimeout(function () {$("#tenbytenSquareOrangeBig").show(0);}, 10500);
+
+});    
+</script>
+</body>
+</html>

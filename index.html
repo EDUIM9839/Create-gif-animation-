@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Sprite Sheet Generator & Preview</title>
+  <title>Sprite Sheet Generator with Animation Options</title>
   <style>
     body {
       font-family: sans-serif;
@@ -17,12 +17,27 @@
     #controls {
       margin-bottom: 20px;
     }
+    select, input {
+      font-size: 18px;
+      margin: 10px;
+    }
   </style>
 </head>
 <body>
-  <h2>Static Image → Sprite Sheet + Preview</h2>
+  <h2>Static Image → Sprite Sheet + Animation Preview</h2>
   <div id="controls">
     <input type="file" id="upload" accept="image/*" />
+    <select id="animationStyle">
+      <option value="idle">Idle</option>
+      <option value="run">Run</option>
+      <option value="jump">Jump</option>
+      <option value="dizzy">Dizzy</option>
+      <option value="sit">Sit</option>
+      <option value="roll">Roll</option>
+      <option value="bite">Bite</option>
+      <option value="ko">KO</option>
+      <option value="gethit">Get Hit</option>
+    </select>
   </div>
   <div>
     <canvas id="spriteSheet" width="800" height="100"></canvas><br>
@@ -35,6 +50,7 @@
 
 <script>
 const upload = document.getElementById("upload");
+const animationStyle = document.getElementById("animationStyle");
 const sheetCanvas = document.getElementById("spriteSheet");
 const previewCanvas = document.getElementById("preview");
 const sheetCtx = sheetCanvas.getContext("2d");
@@ -44,17 +60,18 @@ let spriteFrames = [];
 let currentFrame = 0;
 let spriteWidth = 100;
 let spriteHeight = 100;
-let frameCount = 8; // You can increase this for more variation
+let frameCount = 8;
+let selectedImage = null;
 
 upload.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function (event) {
     const img = new Image();
     img.onload = function () {
-      generateSpriteSheet(img);
+      selectedImage = img;
+      generateSpriteSheet();
       startAnimation();
     };
     img.src = event.target.result;
@@ -62,13 +79,20 @@ upload.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-function generateSpriteSheet(image) {
-  spriteFrames = []; // Reset
+animationStyle.addEventListener("change", () => {
+  if (selectedImage) {
+    generateSpriteSheet();
+  }
+});
+
+function generateSpriteSheet() {
+  spriteFrames = [];
   sheetCtx.clearRect(0, 0, sheetCanvas.width, sheetCanvas.height);
-  const scale = Math.min(spriteWidth / image.width, spriteHeight / image.height);
+  const effect = animationStyle.value;
+  const img = selectedImage;
+  const scale = Math.min(spriteWidth / img.width, spriteHeight / img.height);
 
   for (let i = 0; i < frameCount; i++) {
-    // Create a canvas for each frame
     const frameCanvas = document.createElement("canvas");
     frameCanvas.width = spriteWidth;
     frameCanvas.height = spriteHeight;
@@ -77,23 +101,105 @@ function generateSpriteSheet(image) {
     frameCtx.save();
     frameCtx.translate(spriteWidth / 2, spriteHeight / 2);
 
-    // Fake motion: rotate, scale, translate
+    // Apply animation styles
     const angle = (i / frameCount) * Math.PI * 2;
-    frameCtx.rotate(Math.sin(angle) * 0.3);
-    frameCtx.scale(1 + Math.sin(angle) * 0.1, 1 + Math.cos(angle) * 0.1);
-    frameCtx.drawImage(
-      image,
-      -image.width * scale / 2,
-      -image.height * scale / 2,
-      image.width * scale,
-      image.height * scale
-    );
+    switch (effect) {
+      case "idle":
+        frameCtx.drawImage(
+          img,
+          -img.width * scale / 2,
+          -img.height * scale / 2,
+          img.width * scale,
+          img.height * scale
+        );
+        break;
+      case "run":
+        frameCtx.translate(Math.sin(angle) * 10, 0);
+        frameCtx.drawImage(
+          img,
+          -img.width * scale / 2,
+          -img.height * scale / 2,
+          img.width * scale,
+          img.height * scale
+        );
+        break;
+      case "jump":
+        frameCtx.translate(0, -Math.abs(Math.sin(angle) * 15));
+        frameCtx.drawImage(
+          img,
+          -img.width * scale / 2,
+          -img.height * scale / 2,
+          img.width * scale,
+          img.height * scale
+        );
+        break;
+      case "dizzy":
+        frameCtx.rotate(angle);
+        frameCtx.drawImage(
+          img,
+          -img.width * scale / 2,
+          -img.height * scale / 2,
+          img.width * scale,
+          img.height * scale
+        );
+        break;
+      case "sit":
+        frameCtx.scale(1, 0.7);
+        frameCtx.drawImage(
+          img,
+          -img.width * scale / 2,
+          -img.height * scale / 2,
+          img.width * scale,
+          img.height * scale
+        );
+        break;
+      case "roll":
+        frameCtx.rotate(angle);
+        frameCtx.scale(1 + Math.sin(angle) * 0.1, 1);
+        frameCtx.drawImage(
+          img,
+          -img.width * scale / 2,
+          -img.height * scale / 2,
+          img.width * scale,
+          img.height * scale
+        );
+        break;
+      case "bite":
+        frameCtx.translate(Math.sin(angle * 2) * 5, 0);
+        frameCtx.scale(1.1, 1.1);
+        frameCtx.drawImage(
+          img,
+          -img.width * scale / 2,
+          -img.height * scale / 2,
+          img.width * scale,
+          img.height * scale
+        );
+        break;
+      case "ko":
+        frameCtx.rotate(1.5);
+        frameCtx.globalAlpha = 1 - (i / frameCount);
+        frameCtx.drawImage(
+          img,
+          -img.width * scale / 2,
+          -img.height * scale / 2,
+          img.width * scale,
+          img.height * scale
+        );
+        break;
+      case "gethit":
+        frameCtx.translate(Math.sin(angle * 10) * 4, 0);
+        frameCtx.drawImage(
+          img,
+          -img.width * scale / 2,
+          -img.height * scale / 2,
+          img.width * scale,
+          img.height * scale
+        );
+        break;
+    }
+
     frameCtx.restore();
-
-    // Save for animation preview
     spriteFrames.push(frameCanvas);
-
-    // Draw on sprite sheet canvas
     sheetCtx.drawImage(frameCanvas, i * spriteWidth, 0);
   }
 }
